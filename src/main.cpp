@@ -1,14 +1,15 @@
 #include <Arduino.h>
 #include <ArduinoJson.h>
 
-char output[200]; // Declare a buffer to hold the result
-const int capacity = JSON_OBJECT_SIZE(7);
+char output[256]; // Declare a buffer to hold the result
+const int capacity = 256; // ArduinoJson assistant 
+
 StaticJsonDocument<capacity> doc;
 
 void setup()
 {
   Serial.begin(115200);
-
+ 
   doc["ID"] = 1; //(Int) ID  for watering target
   doc["Description"] = "Short Description of this watering target goes here";
   doc["H_Steps"] = 1145;     //(int) Horizontal steps from 'Home'
