@@ -1,5 +1,5 @@
 #pragma once
-#include "declarations.h"
+#include "MS_Functions.h"
 
 void makeWaterTarget(int id, String desc, int Hs, int Hf, int Vs, int Vf, int spray, int rwt, bool W_on)
 {
