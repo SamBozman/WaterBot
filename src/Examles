@@ -1,0 +1,24 @@
+
+Serial.println("SPIFFS-like write file to new path and delete it w/folders");
+    writeFile2(LittleFS, "/new1/new2/new3/hello3.txt", "Hello3");
+    listDir(LittleFS, "/", 3);
+    deleteFile2(LittleFS, "/new1/new2/new3/hello3.txt");
+    listDir(LittleFS, "/", 3);
+
+    createDir(LittleFS, "/mydir");
+    writeFile(LittleFS, "/mydir/hello2.txt", "Hello2");
+    listDir(LittleFS, "/", 1);
+    deleteFile(LittleFS, "/mydir/hello2.txt");
+    removeDir(LittleFS, "/mydir");
+    listDir(LittleFS, "/", 1);
+    
+    writeFile(LittleFS, "/hello.txt", "Hello ");
+    appendFile(LittleFS, "/hello.txt", "World!\r\n");
+    readFile(LittleFS, "/hello.txt");
+    renameFile(LittleFS, "/hello.txt", "/foo.txt");
+    readFile(LittleFS, "/foo.txt");
+    deleteFile(LittleFS, "/foo.txt");
+    testFileIO(LittleFS, "/test.txt");
+    deleteFile(LittleFS, "/test.txt");
+
+    Serial.println("Test complete");

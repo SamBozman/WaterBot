@@ -1,6 +1,15 @@
 #pragma once
-#include "declarations.h"
+#include "globals.h"
 
+
+void mountLFS()
+{
+   if (!LittleFS.begin(FORMAT_LITTLEFS_IF_FAILED))
+   {
+      Serial.println("LittleFS Mount Failed");
+      return;
+   }
+}
 
 void listDir(fs::FS &fs, const char *dirname, uint8_t levels)
 
