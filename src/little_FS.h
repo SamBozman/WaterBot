@@ -1,5 +1,5 @@
-#pragma onceSerial.print
-#include "globals.h"
+#pragma once
+#include "code1.h"
 
 void mountLFS()
 {

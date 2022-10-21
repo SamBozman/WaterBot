@@ -4,15 +4,38 @@
 void setup()
 {
   Serial.begin(115200);
-  mountLFS(); // Located in 'other_functions.h'
+  mountLFS();
+
+  debugln("Going to list Directories");
   listDir(LittleFS, "/", 1);
-  createDir(LittleFS, "/mydir");
-  writeFile(LittleFS, "/mydir/hello2.txt", "Hello2");
-  writeFile(LittleFS, "/mydir/hello3.txt", "Hello3");
-  readFile(LittleFS, "/mydir/hello2.txt");
-  readFile(LittleFS, "/mydir/hello3.txt");
-  deleteFile(LittleFS, "/mydir/hello2.txt");
-  deleteFile(LittleFS, "/mydir/hello3.txt");
-  removeDir(LittleFS, "/mydir");
+  debugln("Listed Directories");
+  debugln("");
+
+  debugln("Going to create files");
+  createTestFiles(2);
+  debugln("Files created");
+  debugln("");
+
+  debugln("Going to list Directories");
   listDir(LittleFS, "/", 1);
+  debugln("Listed Directories");
+  debugln("");
+
+  debugln("Going to read A1");
+  readFile(LittleFS, "/A1");
+  debugln("Read A1");
+  debugln("");
+ 
+ debugln("Going to read A2");
+  readFile(LittleFS, "/A2");
+  debugln("Read A2");
+  debugln("");
+
+  debugln("Going to remove files");
+  removeTestFiles(2);
+  debugln("Files removed");
+
+  debugln("Going to list Directories");
+  listDir(LittleFS, "/", 1);
+  debugln("Listed Directories");
 }

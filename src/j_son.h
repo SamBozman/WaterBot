@@ -1,7 +1,7 @@
 #pragma once
 #include "little_FS.h"
 
-void makeWaterTarget(int id, String name, int Hs, int Hf, int Vs, int Vf, int spray, int rwt, bool W_on)
+void makeWaterTarget(int id, String name, long Hs, long Hf, long Vs, long Vf, long spray, long rwt, bool W_on)
 {
   const int capacity = 256;         // Buffer for StaticJsonDocument doc
   StaticJsonDocument<capacity> doc; // Declare StaticJsonDocument doc
