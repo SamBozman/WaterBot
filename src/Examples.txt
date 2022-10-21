@@ -1,5 +1,5 @@
 
-Serial.println("SPIFFS-like write file to new path and delete it w/folders");
+debugln("SPIFFS-like write file to new path and delete it w/folders");
     writeFile2(LittleFS, "/new1/new2/new3/hello3.txt", "Hello3");
     listDir(LittleFS, "/", 3);
     deleteFile2(LittleFS, "/new1/new2/new3/hello3.txt");
@@ -21,4 +21,4 @@ Serial.println("SPIFFS-like write file to new path and delete it w/folders");
     testFileIO(LittleFS, "/test.txt");
     deleteFile(LittleFS, "/test.txt");
 
-    Serial.println("Test complete");
+    debugln("Test complete");

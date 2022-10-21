@@ -1,14 +1,13 @@
-#pragma once
+#pragma onceSerial.print
 #include "globals.h"
-
 
 void mountLFS()
 {
-   if (!LittleFS.begin(FORMAT_LITTLEFS_IF_FAILED))
-   {
-      Serial.println("LittleFS Mount Failed");
-      return;
-   }
+    if (!LittleFS.begin(FORMAT_LITTLEFS_IF_FAILED))
+    {
+        debugln("LittleFS Mount Failed");
+        return;
+    }
 }
 
 void listDir(fs::FS &fs, const char *dirname, uint8_t levels)
@@ -19,12 +18,12 @@ void listDir(fs::FS &fs, const char *dirname, uint8_t levels)
     File root = fs.open(dirname);
     if (!root)
     {
-        Serial.println("- failed to open directory");
+        debugln("- failed to open directory");
         return;
     }
     if (!root.isDirectory())
     {
-        Serial.println(" - not a directory");
+        debugln(" - not a directory");
         return;
     }
 
@@ -33,8 +32,8 @@ void listDir(fs::FS &fs, const char *dirname, uint8_t levels)
     {
         if (file.isDirectory())
         {
-            Serial.print("  DIR : ");
-            Serial.println(file.name());
+            debug("  DIR : ");
+            debugln(file.name());
             if (levels)
             {
                 listDir(fs, file.path(), levels - 1);
@@ -42,10 +41,10 @@ void listDir(fs::FS &fs, const char *dirname, uint8_t levels)
         }
         else
         {
-            Serial.print("  FILE: ");
-            Serial.print(file.name());
-            Serial.print("\tSIZE: ");
-            Serial.println(file.size());
+            debug("  FILE: ");
+            debug(file.name());
+            debug("\tSIZE: ");
+            debugln(file.size());
         }
         file = root.openNextFile();
     }
@@ -56,11 +55,11 @@ void createDir(fs::FS &fs, const char *path)
     Serial.printf("Creating Dir: %s\n", path);
     if (fs.mkdir(path))
     {
-        Serial.println("Dir created");
+        debugln("Dir created");
     }
     else
     {
-        Serial.println("mkdir failed");
+        debugln("mkdir failed");
     }
 }
 
@@ -69,11 +68,11 @@ void removeDir(fs::FS &fs, const char *path)
     Serial.printf("Removing Dir: %s\n", path);
     if (fs.rmdir(path))
     {
-        Serial.println("Dir removed");
+        debugln("Dir removed");
     }
     else
     {
-        Serial.println("rmdir failed");
+        debugln("rmdir failed");
     }
 }
 
@@ -84,15 +83,16 @@ void readFile(fs::FS &fs, const char *path)
     File file = fs.open(path);
     if (!file || file.isDirectory())
     {
-        Serial.println("- failed to open file for reading");
+        debugln("- failed to open file for reading");
         return;
     }
 
-    Serial.println("- read from file:");
+    debug("- read from file: ");
     while (file.available())
     {
         Serial.write(file.read());
     }
+    debugln("");
     file.close();
 }
 
@@ -103,16 +103,16 @@ void writeFile(fs::FS &fs, const char *path, const char *message)
     File file = fs.open(path, FILE_WRITE);
     if (!file)
     {
-        Serial.println("- failed to open file for writing");
+        debugln("- failed to open file for writing");
         return;
     }
     if (file.print(message))
     {
-        Serial.println("- file written");
+        debugln("- file written");
     }
     else
     {
-        Serial.println("- write failed");
+        debugln("- write failed");
     }
     file.close();
 }
@@ -124,16 +124,16 @@ void appendFile(fs::FS &fs, const char *path, const char *message)
     File file = fs.open(path, FILE_APPEND);
     if (!file)
     {
-        Serial.println("- failed to open file for appending");
+        debugln("- failed to open file for appending");
         return;
     }
     if (file.print(message))
     {
-        Serial.println("- message appended");
+        debugln("- message appended");
     }
     else
     {
-        Serial.println("- append failed");
+        debugln("- append failed");
     }
     file.close();
 }
@@ -143,11 +143,11 @@ void renameFile(fs::FS &fs, const char *path1, const char *path2)
     Serial.printf("Renaming file %s to %s\r\n", path1, path2);
     if (fs.rename(path1, path2))
     {
-        Serial.println("- file renamed");
+        debugln("- file renamed");
     }
     else
     {
-        Serial.println("- rename failed");
+        debugln("- rename failed");
     }
 }
 
@@ -156,14 +156,13 @@ void deleteFile(fs::FS &fs, const char *path)
     Serial.printf("Deleting file: %s\r\n", path);
     if (fs.remove(path))
     {
-        Serial.println("- file deleted");
+        debugln("- file deleted");
     }
     else
     {
-        Serial.println("- delete failed");
+        debugln("- delete failed");
     }
 }
-
 
 // SPIFFS-like write and delete file, better use #define CONFIG_LITTLEFS_SPIFFS_COMPAT 1
 
@@ -194,16 +193,16 @@ void writeFile2(fs::FS &fs, const char *path, const char *message)
     File file = fs.open(path, FILE_WRITE);
     if (!file)
     {
-        Serial.println("- failed to open file for writing");
+        debugln("- failed to open file for writing");
         return;
     }
     if (file.print(message))
     {
-        Serial.println("- file written");
+        debugln("- file written");
     }
     else
     {
-        Serial.println("- write failed");
+        debugln("- write failed");
     }
     file.close();
 }
@@ -214,11 +213,11 @@ void deleteFile2(fs::FS &fs, const char *path)
 
     if (fs.remove(path))
     {
-        Serial.println("- file deleted");
+        debugln("- file deleted");
     }
     else
     {
-        Serial.println("- delete failed");
+        debugln("- delete failed");
     }
 
     char *pathStr = strdup(path);
@@ -248,22 +247,22 @@ void testFileIO(fs::FS &fs, const char *path)
     File file = fs.open(path, FILE_WRITE);
     if (!file)
     {
-        Serial.println("- failed to open file for writing");
+        debugln("- failed to open file for writing");
         return;
     }
 
     size_t i;
-    Serial.print("- writing");
+    debug("- writing");
     uint32_t start = millis();
     for (i = 0; i < 2048; i++)
     {
         if ((i & 0x001F) == 0x001F)
         {
-            Serial.print(".");
+            debug(".");
         }
         file.write(buf, 512);
     }
-    Serial.println("");
+    debugln("");
     uint32_t end = millis() - start;
     Serial.printf(" - %u bytes written in %u ms\r\n", 2048 * 512, end);
     file.close();
@@ -277,7 +276,7 @@ void testFileIO(fs::FS &fs, const char *path)
         len = file.size();
         size_t flen = len;
         start = millis();
-        Serial.print("- reading");
+        debug("- reading");
         while (len)
         {
             size_t toRead = len;
@@ -288,17 +287,17 @@ void testFileIO(fs::FS &fs, const char *path)
             file.read(buf, toRead);
             if ((i++ & 0x001F) == 0x001F)
             {
-                Serial.print(".");
+                debug(".");
             }
             len -= toRead;
         }
-        Serial.println("");
+        debugln("");
         end = millis() - start;
         Serial.printf("- %u bytes read in %u ms\r\n", flen, end);
         file.close();
     }
     else
     {
-        Serial.println("- failed to open file for reading");
+        debugln("- failed to open file for reading");
     }
 }

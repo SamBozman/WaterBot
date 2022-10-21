@@ -6,7 +6,7 @@ void makeWaterTarget(int id, String name, int Hs, int Hf, int Vs, int Vf, int sp
   const int capacity = 256;         // Buffer for StaticJsonDocument doc
   StaticJsonDocument<capacity> doc; // Declare StaticJsonDocument doc
 
-    doc["ID"] = id; //(Int) ID  for watering target
+  doc["ID"] = id; //(Int) ID  for watering target
   doc["Name"] = name;
   doc["H_Steps"] = Hs;       //(int) Horizontal steps from 'Home'
   doc["H_Fluctuation"] = Hf; //(int) back and forth fluctuation for coverage
