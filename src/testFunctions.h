@@ -1,13 +1,15 @@
 #pragma once
 #include "globals.h"
 
+// function to make a char path from a string
 void stochar(int x)
 {
-   String s = "/A" + String(x);
-   int n = s.length();
-   strcpy(path, s.c_str());
+   String s = "/A" + String(x); // Combine 2 strings
+   int n = s.length();          // Get length of combined string
+   strcpy(path, s.c_str());     // Convert it to a char array
 }
 
+// Create random water Target json files and write them to file system
 void createTestFiles(int n)
 {
    for (int x = 1; x <= n; x++)
@@ -17,8 +19,10 @@ void createTestFiles(int n)
       stochar(x);
       writeFile(LittleFS, path, g_output);
    }
+   listDir(LittleFS, "/", 1);
 }
 
+// Remove random water Target json files from file system
 void removeTestFiles(int n)
 {
    for (int x = 1; x <= n; x++)
@@ -26,4 +30,5 @@ void removeTestFiles(int n)
       stochar(x);
       deleteFile(LittleFS, path);
    }
+   listDir(LittleFS, "/", 1);
 }
