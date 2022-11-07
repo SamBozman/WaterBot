@@ -50,6 +50,7 @@ void doStepLoop();
 void makeWaterTarget(int id, String name, long Hs, long Hf, long Vs, long Vf,
                      long spray, long rwt, bool W_on);
 void listDir(fs::FS &fs, const char *dirname, uint8_t levels);
+int listFiles(fs::FS &fs, const char *dirname, uint8_t levels);
 void createDir(fs::FS &fs, const char *path);
 void removeDir(fs::FS &fs, const char *path);
 void readFile(fs::FS &fs, const char *path);
