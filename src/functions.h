@@ -1,84 +1,79 @@
 #pragma once
 #include "testFunctions.h"
 
-//********************************************************************
-void doStepLoop()
+//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+void homeStepper(AccelStepper Stepper, int homePin)
 {
-    boolean pos = Stepper.speed() >= 0 ? true : false;
+    int move_finished = 1;    // Used to check if move is completed
+    long initial_homing = -1; // Used to Home Stepper at startup
+    pinMode(homePin, INPUT_PULLUP);
 
-    if (pos == true && (maxPosition - Stepper.currentPosition() <= 200))
+    delay(5);
+
+    //  Set Max Speed and Acceleration of each Steppers at startup for homing
+    Stepper.setMaxSpeed(100.0);     // Set Max Speed of Stepper (Slower to get better accuracy)
+    Stepper.setAcceleration(100.0); // Set Acceleration of Stepper
+
+    // Start Homing procedure of Stepper Motor at startup
+
+    while (digitalRead(homePin)) // Do WHILE switch not activated (NOT true)
     {
-        Stepper.setMaxSpeed(200);
-        Stepper.setAcceleration(100.0); // this makes motor stop much quicker!
-        Stepper.runToNewPosition(maxPosition);
-        debug("Position after maxPosition: ");
-        debugln(Stepper.currentPosition());
+        // Make the Stepper move CCW
+        // until the switch is activated
+        Stepper.moveTo(initial_homing); // Set the position to move to
+        initial_homing--;               // Decrease by 1 for next move if needed
+        Stepper.run();                  // Start moving the stepper
+        delay(5);
     }
-    else if (pos == false && (Stepper.currentPosition() <= 200))
+
+    Stepper.setCurrentPosition(0);  // Set the current position as zero for now
+    Stepper.setMaxSpeed(100.0);     // Set Max Speed of Stepper (Slower to get better accuracy)
+    Stepper.setAcceleration(100.0); // Set Acceleration of Stepper
+
+    initial_homing = 1;
+    while (!digitalRead(homePin))
     {
-        Stepper.setMaxSpeed(200);
-        Stepper.setAcceleration(100.0); // this makes motor stop much quicker!
-        Stepper.runToNewPosition(home);
-        debug("Position after home: ");
-        debugln(Stepper.currentPosition());
+        // Make the Stepper move CW until the
+        // until the switch is deactivated
+        Stepper.moveTo(initial_homing);
+        Stepper.run();
+        initial_homing++;
+        delay(5);
     }
-    else
-    {
-        Stepper.setMaxSpeed(300);
-        Stepper.setAcceleration(100);
-        Stepper.runSpeed();
-    }
+    Stepper.setCurrentPosition(0);
+
+    Serial.println("Homing Completed");
+    Serial.println("");
+    Stepper.setMaxSpeed(200.0);     // Set Max Speed of Stepper (Faster for regular movements)
+    Stepper.setAcceleration(100.0); // Set Acceleration of Stepper
 }
-
-//********************************************************************
-void processStepper(float incoming)
+//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+void processIncoming(int incoming)
 {
-    float stepperSpeed;
-
-    if (incoming <= 65 && incoming >= 55)
+    switch (incoming)
     {
-        stepperSpeed = 0;
-        ESP_BT.write(stepperSpeed); // Write stepper speed back to cell phone app
-        exit;
-    }
-    else
-    {
-        if (incoming > 65)
-        {
-            stepperSpeed = pow(1.12, incoming - 60);
-            ESP_BT.write(stepperSpeed); // Write stepper speed back to cell phone app
-        }
 
-        if (incoming < 55)
-        {
-            stepperSpeed = -(pow(1.12, -(incoming - 60)));
-            ESP_BT.write(-stepperSpeed); // Write stepper speed back to cell phone
-        }
-    }
-
-    Stepper.setSpeed(stepperSpeed);
-}
-
-//********************************************************************
-void processIncoming(float incoming)
-{
-    int result = (int)floorf(incoming);
-    switch (result)
-    {
     case 201:
         Stepper = Hstepper;
-        ESP_BT.write(result); // Call back to app
-        debugln("Sending 201");
+        ESP_BT.write(incoming); // Call back to app
+        debugln("Sending 201 back to app");
         break;
     case 202:
         Stepper = Vstepper;
-        ESP_BT.write(result); // Call back to app
-        debugln("Sending 202");
+        ESP_BT.write(incoming); // Call back to app
+        debugln("Sending 202 back to app");
         break;
     case 203:
         Stepper = Sstepper;
-        ESP_BT.write(result); // Call back to app
-        debugln("Sending 203");
+        ESP_BT.write(incoming); // Call back to app
+        debugln("Sending 203 back to app");
+        break;
+    case 204:                   //! Will eventually be used to control water on/off
+        ESP_BT.write(incoming); // Call back to app
+        debugln("Sending 204 back to app");
+        Hstepper.disableOutputs(); // TODO Temporary to shut off steppers for testing
+        Vstepper.disableOutputs(); // TODO Temporary to shut off steppers for testing
+        Sstepper.disableOutputs(); // TODO Temporary to shut off steppers for testing
         break;
 
     default:
@@ -87,50 +82,58 @@ void processIncoming(float incoming)
     }
 }
 
-//********************************************************************
-void homeStepper(AccelStepper Stepper, int homePin)
+//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+void processStepper(int incoming)
 {
-    int move_finished = 1;    // Used to check if move is completed
-    long initial_homing = -1; // Used to Home Stepper at startup
-    pinMode(homePin, INPUT_PULLUP);
-    Stepper.setMaxSpeed(100);
-    Stepper.setAcceleration(25.0); // 25 steps per second
+    Stepper.setMaxSpeed(300);
+    int stepperSpeed;
+    incoming = incoming - 100;
 
-    Serial.print("Stepper is Homing ");
-    Serial.print("Micro Switch is: ");
-    Serial.println(digitalRead(homePin));
-
-    while (digitalRead(homePin)) // Do WHILE switch not activated (NOT true)
+    if (incoming >= -5 && incoming <= 5)
     {
-        Serial.print("Micro Switch is: ");
-        Serial.println(digitalRead(homePin));
-        // Make the Stepper move CCW until the switch is activated
-        Stepper.moveTo(initial_homing); // Set the position to move to
-        initial_homing--;               // Decrease by 1 for next move if needed
-        Stepper.run();                  // Start moving the stepper
-        delay(5);
+        stepperSpeed = 0;
+        ESP_BT.write(stepperSpeed);
     }
-    // ****DO NOT USE setCurrentPosition() WHILE STEPPER IS IN MOTION
-    // ***************
-    Stepper.setCurrentPosition(0); // Set the current position as zero for now
-
-    Stepper.setMaxSpeed(100.0);    // Set Max Speed of Stepper (Slower to get better accuracy)
-    Stepper.setAcceleration(25.0); // Set Acceleration of Stepper
-    initial_homing = 1;
-
-    while (!digitalRead(homePin))
-    { // Make the Stepper move CW until the switch is deactivated
-        Stepper.moveTo(initial_homing);
-        Stepper.run();
-        initial_homing++;
-        delay(5);
+    else if (incoming >= -100 && incoming <= 100)
+    {
+        stepperSpeed = incoming;
+        ESP_BT.write(abs(stepperSpeed)); // abs changes negative values to positive
     }
-    Serial.println("Homing Completed");
-    Serial.println("");
-    Stepper.setCurrentPosition(0);
+    else
+    {
+        stepperSpeed = 0;
+        ESP_BT.write(stepperSpeed);
+    }
+    Stepper.setSpeed(stepperSpeed);
 }
 
-//********************************************************************
+//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+void doStepLoop()
+{
+    debug("Current position is ");
+    debugln(Stepper.currentPosition());
+
+    if (Stepper.currentPosition() < -10)
+    {
+        Stepper.setMaxSpeed(100.0);    // Set Max Speed of Stepper (Slower to get better accuracy)
+        Stepper.setAcceleration(50.0); // Set Acceleration of Stepper
+        Stepper.moveTo(home);
+        Stepper.runToPosition();
+        ESP_BT.write(appClear);
+    }
+    else if (Stepper.currentPosition() > (maxPosition + 10))
+    {
+        Stepper.setMaxSpeed(100.0);    // Set Max Speed of Stepper (Slower to get better accuracy)
+        Stepper.setAcceleration(50.0); // Set Acceleration of Stepper
+        Stepper.moveTo(maxPosition);
+        Stepper.runToPosition();
+        ESP_BT.write(appClear);
+    }
+    else
+        Stepper.runSpeed();
+}
+
+//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 void makeWaterTarget(int id, String name, long Hs, long Hf, long Vs, long Vf, long spray, long rwt, bool W_on)
 {
     const int capacity = 256;         // Buffer for StaticJsonDocument doc
@@ -149,7 +152,7 @@ void makeWaterTarget(int id, String name, long Hs, long Hf, long Vs, long Vf, lo
     serializeJson(doc, g_output);
 }
 
-//********************************************************************
+//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 void mountLFS()
 {
     if (!LittleFS.begin(FORMAT_LITTLEFS_IF_FAILED))
@@ -159,7 +162,7 @@ void mountLFS()
     }
 }
 
-//********************************************************************
+//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 int listFiles(fs::FS &fs, const char *dirname, uint8_t levels, int numFiles)
 {
     Serial.printf("Listing directory: %s\r\n", dirname);
@@ -204,7 +207,7 @@ int listFiles(fs::FS &fs, const char *dirname, uint8_t levels, int numFiles)
     return numFiles;
 }
 
-//********************************************************************
+//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 void listDir(fs::FS &fs, const char *dirname, uint8_t levels)
 {
     Serial.printf("Listing directory: %s\r\n", dirname);
@@ -244,7 +247,7 @@ void listDir(fs::FS &fs, const char *dirname, uint8_t levels)
     }
 }
 
-//********************************************************************
+//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 void createDir(fs::FS &fs, const char *path)
 {
     Serial.printf("Creating Dir: %s\n", path);
@@ -258,7 +261,7 @@ void createDir(fs::FS &fs, const char *path)
     }
 }
 
-//********************************************************************
+//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 void removeDir(fs::FS &fs, const char *path)
 {
     Serial.printf("Removing Dir: %s\n", path);
@@ -272,7 +275,7 @@ void removeDir(fs::FS &fs, const char *path)
     }
 }
 
-//********************************************************************
+//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 void readFile(fs::FS &fs, const char *path)
 {
     Serial.printf("Reading file: %s\r\n", path);
@@ -293,7 +296,7 @@ void readFile(fs::FS &fs, const char *path)
     file.close();
 }
 
-//********************************************************************
+//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 void writeFile(fs::FS &fs, const char *path, const char *message)
 {
     Serial.printf("Writing file: %s\r\n", path);
@@ -315,7 +318,7 @@ void writeFile(fs::FS &fs, const char *path, const char *message)
     file.close();
 }
 
-//********************************************************************
+//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 void appendFile(fs::FS &fs, const char *path, const char *message)
 {
     Serial.printf("Appending to file: %s\r\n", path);
@@ -337,7 +340,7 @@ void appendFile(fs::FS &fs, const char *path, const char *message)
     file.close();
 }
 
-//********************************************************************
+//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 void renameFile(fs::FS &fs, const char *path1, const char *path2)
 {
     Serial.printf("Renaming file %s to %s\r\n", path1, path2);
@@ -351,7 +354,7 @@ void renameFile(fs::FS &fs, const char *path1, const char *path2)
     }
 }
 
-//********************************************************************
+//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 void deleteFile(fs::FS &fs, const char *path)
 {
     Serial.printf("Deleting file: %s\r\n", path);
@@ -368,7 +371,7 @@ void deleteFile(fs::FS &fs, const char *path)
 // SPIFFS-like write and delete file, better use #define
 // CONFIG_LITTLEFS_SPIFFS_COMPAT 1
 
-//********************************************************************
+//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 void writeFile2(fs::FS &fs, const char *path, const char *message)
 {
     if (!fs.exists(path))
@@ -410,7 +413,7 @@ void writeFile2(fs::FS &fs, const char *path, const char *message)
     file.close();
 }
 
-//********************************************************************
+//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 void deleteFile2(fs::FS &fs, const char *path)
 {
     Serial.printf("Deleting file and empty folders on path: %s\r\n", path);
@@ -442,7 +445,7 @@ void deleteFile2(fs::FS &fs, const char *path)
     }
 }
 
-//********************************************************************
+//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 void testFileIO(fs::FS &fs, const char *path)
 {
     Serial.printf("Testing file I/O with %s\r\n", path);

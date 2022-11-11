@@ -40,23 +40,15 @@ AccelStepper Stepper;   // Declare a variable to hold the current stepper object
 #define FORMAT_LITTLEFS_IF_FAILED true
 char g_output[256]; // Serialized water target object
 char path[10];      // Used by function 'stochar()'
-
-
-
-
-
-
-
-
-
+int appClear = 255;
+//++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 // All function declarations go here
 void homeStepper(AccelStepper Stepper, int homePin);
-void processIncoming(float incoming);
-void processStepper(float incoming);
+void processIncoming(int incoming);
+void processStepper(int incoming);
 void doStepLoop();
 
-void makeWaterTarget(int id, String name, long Hs, long Hf, long Vs, long Vf,
-                     long spray, long rwt, bool W_on);
+void makeWaterTarget(int id, String name, long Hs, long Hf, long Vs, long Vf, long spray, long rwt, bool W_on);
 void listDir(fs::FS &fs, const char *dirname, uint8_t levels);
 int listFiles(fs::FS &fs, const char *dirname, uint8_t levels);
 void createDir(fs::FS &fs, const char *path);
