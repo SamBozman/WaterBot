@@ -14,7 +14,7 @@ void createTestFiles(int n)
 {
    for (int x = 1; x <= n; x++)
    {
-      makeWaterTarget(x, "Test", random(4000), random(4000), random(4000), random(4000),
+      makeWaterTarget(x, "Test", random(4000), random(4000),random(4000), random(4000), random(4000),
                       random(4000), random(4000), false);
       stochar(x);// Takes the int value of x and adds a '/A' to it to create a directory Path 
       writeFile(LittleFS, path, g_output);

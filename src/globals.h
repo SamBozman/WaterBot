@@ -48,7 +48,7 @@ void processIncoming(int incoming);
 void processStepper(AccelStepper &Stepper, int incoming);
 void doStepLoop(AccelStepper &Stepper);
 
-void makeWaterTarget(int id, String name, long Hs, long Hf, long Vs, long Vf, long spray, long rwt, bool W_on);
+void makeWaterTarget(int id, String name, long Hs, long Hf, long Vs, long Vf, long Ss, long Sf, long rwt, bool W_on);
 void listDir(fs::FS &fs, const char *dirname, uint8_t levels);
 int listFiles(fs::FS &fs, const char *dirname, uint8_t levels);
 void createDir(fs::FS &fs, const char *path);
