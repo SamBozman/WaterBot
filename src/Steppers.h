@@ -56,6 +56,8 @@ void homeStepper(AccelStepper &Stepper, int homePin)
 //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 void processIncoming(int incoming)
 {
+    unsigned char textBlock[] = "Hello to everyone who loves me \n";
+    unsigned char textBlock2[] = "Goodbye to everyone who hates me \n";
     switch (incoming)
     {
 
@@ -82,6 +84,14 @@ void processIncoming(int incoming)
         ESP_BT.write(appClear); // reset slider poition to 100 (center) & clear buttons
         ESP_BT.write(incoming); // //! Will eventually be used to control water on/off
         debugln("Sending 204 back to app");
+        break;
+    case 254:
+        //! Will eventually be used to control water on/off
+        stepperNum = 0;         // No Stepper used here
+        ESP_BT.write(appClear); // reset slider poition to 100 (center) & clear buttons
+        ESP_BT.write(textBlock, sizeof(textBlock));
+        ESP_BT.write(textBlock2, sizeof(textBlock2)); //* Testing writing block to text back to app
+        debugln("Sending text block back to app");
         break;
     case 255:                   // disableOutputs
         stepperNum = 0;         // No Stepper used here
