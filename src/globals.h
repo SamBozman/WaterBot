@@ -34,7 +34,7 @@ AccelStepper Hstepper = AccelStepper(MotorInterfaceType, 26, 33, 25, 32);
 AccelStepper Vstepper = AccelStepper(MotorInterfaceType, 13, 14, 12, 27);
 AccelStepper Sstepper = AccelStepper(MotorInterfaceType, 5, 19, 18, 21);
 
-BluetoothSerial ESP_BT; // init Class:AccelStepper *pStepper; 
+BluetoothSerial ESP_BT; // init Class:AccelStepper *pStepper;
 
 #define FORMAT_LITTLEFS_IF_FAILED true
 char g_output[256]; // Serialized water target object
@@ -51,6 +51,7 @@ void doStepLoop(AccelStepper &Stepper);
 void makeWaterTarget(int id, String name, long Hs, long Hf, long Vs, long Vf, long Ss, long Sf, long rwt, bool W_on);
 void listDir(fs::FS &fs, const char *dirname, uint8_t levels);
 bool isDir(fs::FS &fs, const char *dirname, uint8_t levels);
+
 int listFiles(fs::FS &fs, const char *dirname, uint8_t levels);
 void createDir(fs::FS &fs, const char *path);
 void removeDir(fs::FS &fs, const char *path);
