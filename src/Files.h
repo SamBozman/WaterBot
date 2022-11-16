@@ -1,7 +1,6 @@
 #pragma once
 #include "testFunctions.h"
 
-
 //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 void makeWaterTarget(int id, String name, long Hs, long Hf, long Vs, long Vf, long Ss, long Sf, long rwt, bool W_on)
 {
@@ -114,6 +113,28 @@ void listDir(fs::FS &fs, const char *dirname, uint8_t levels)
             debugln(file.size());
         }
         file = root.openNextFile();
+    }
+}
+
+//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+bool isDir(fs::FS &fs, const char *dirname, uint8_t levels)
+{
+    Serial.printf("Listing directory: %s\r\n", dirname);
+
+    File root = fs.open(dirname);
+    if (!root)
+    {
+        debugln("- failed to open directory");
+        return false;
+    }
+    if (!root.isDirectory())
+    {
+        debugln(" - not a directory");
+        return false;
+    }
+    else
+    {
+        return true;
     }
 }
 
