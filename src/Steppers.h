@@ -62,71 +62,54 @@ void processIncoming(int incoming)
     {
 
     case 201:
-        stepperNum = 1;         // Hstepper
+        StepPtr = &Hstepper;    // Hstepper
         ESP_BT.write(appClear); // reset slider poition to 100 (center) & clear buttons
         ESP_BT.write(incoming); // Set app to use Hstepper
         debugln("Sending 201 back to app");
         break;
     case 202:
-        stepperNum = 2;         // Vstepper
+        StepPtr = &Vstepper;    // Vstepper
         ESP_BT.write(appClear); // reset slider poition to 100 (center) & clear buttons
         ESP_BT.write(incoming); // Set app to use Vstepper
         debugln("Sending 202 back to app");
         break;
     case 203:
-        stepperNum = 3;         // Sstepper
+        StepPtr = &Sstepper;    // Sstepper
         ESP_BT.write(appClear); // reset slider poition to 100 (center) & clear buttons
         ESP_BT.write(incoming); // Set app to use Sstepper
         debugln("Sending 203 back to app");
         break;
     case 204:                   //! Will eventually be used to control water on/off
-        stepperNum = 0;         // No Stepper used here
         ESP_BT.write(appClear); // reset slider poition to 100 (center) & clear buttons
         ESP_BT.write(incoming); // //! Will eventually be used to control water on/off
         debugln("Sending 204 back to app");
         break;
-    case 254:
-        //! Will eventually be used to control water on/off
-        stepperNum = 0;         // No Stepper used here
+    case 254:                   //! Testing blob text to WaterBot app
         ESP_BT.write(appClear); // reset slider poition to 100 (center) & clear buttons
         ESP_BT.write(textBlock, sizeof(textBlock));
         ESP_BT.write(textBlock2, sizeof(textBlock2)); //* Testing writing block to text back to app
         debugln("Sending text block back to app");
         break;
-    case 255:                   // disableOutputs
-        stepperNum = 0;         // No Stepper used here
+    case 255:                   //! disableOutputs for testing 
         ESP_BT.write(appClear); // reset slider poition to 100 (center) & clear buttons
-        ESP_BT.write(incoming); // //! Will eventually be used to control water on/off
+        ESP_BT.write(incoming); 
         debugln("Sending 255 back to app");
         Hstepper.disableOutputs(); // TODO Temporary to shut off steppers for testing
         Vstepper.disableOutputs(); // TODO Temporary to shut off steppers for testing
         Sstepper.disableOutputs(); // TODO Temporary to shut off steppers for testing
         break;
     default:
-        switch (stepperNum)
-        {
-        case 1:
-            processStepper(Hstepper, incoming);
-            break;
-        case 2:
-            processStepper(Vstepper, incoming);
-            break;
-        case 3:
-            processStepper(Sstepper, incoming);
-            break;
-        default:
-            break;
-        }
+        processStepper(StepPtr, incoming);
         break;
     }
 }
 
 // //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-void processStepper(AccelStepper &Stepper, int incoming)
+void processStepper(AccelStepper *Stepper, int incoming)
 {
     int stepperSpeed = 0;
-    Stepper.setMaxSpeed(300);
-    Stepper.setSpeed(stepperSpeed);
+    Stepper->setMaxSpeed(300);
+    Stepper->setSpeed(stepperSpeed);
     incoming = incoming - 100;
 
     if (incoming >= -5 && incoming <= 5)
@@ -144,31 +127,31 @@ void processStepper(AccelStepper &Stepper, int incoming)
         stepperSpeed = 0;
         ESP_BT.write(stepperSpeed);
     }
-    Stepper.setSpeed(stepperSpeed);
+    Stepper->setSpeed(stepperSpeed);
 }
 
 // //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-void doStepLoop(AccelStepper &Stepper)
+void doStepLoop(AccelStepper *Stepper)
 {
     debug("Current position is ");
-    debugln(Stepper.currentPosition());
+    debugln(Stepper->currentPosition());
 
-    if (Stepper.currentPosition() < -10)
+    if (Stepper->currentPosition() < -10)
     {
-        Stepper.setMaxSpeed(100.0);    // Set Max Speed of Stepper (Slower to get better accuracy)
-        Stepper.setAcceleration(50.0); // Set Acceleration of Stepper
-        Stepper.moveTo(home);
-        Stepper.runToPosition();
+        Stepper->setMaxSpeed(100.0);    // Set Max Speed of Stepper (Slower to get better accuracy)
+        Stepper->setAcceleration(50.0); // Set Acceleration of Stepper
+        Stepper->moveTo(home);
+        Stepper->runToPosition();
         ESP_BT.write(appClear);
     }
-    else if (Stepper.currentPosition() > (maxPosition + 10))
+    else if (Stepper->currentPosition() > (maxPosition + 10))
     {
-        Stepper.setMaxSpeed(100.0);    // Set Max Speed of Stepper (Slower to get better accuracy)
-        Stepper.setAcceleration(50.0); // Set Acceleration of Stepper
-        Stepper.moveTo(maxPosition);
-        Stepper.runToPosition();
+        Stepper->setMaxSpeed(100.0);    // Set Max Speed of Stepper (Slower to get better accuracy)
+        Stepper->setAcceleration(50.0); // Set Acceleration of Stepper
+        Stepper->moveTo(maxPosition);
+        Stepper->runToPosition();
         ESP_BT.write(appClear);
     }
     else
-        Stepper.runSpeed();
+        Stepper->runSpeed();
 }

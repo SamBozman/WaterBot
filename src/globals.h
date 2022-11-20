@@ -29,24 +29,26 @@
 #define hHomePin 34
 #define vHomePin 39
 #define sHomePin 36
+#define appClear 255
 
 AccelStepper Hstepper = AccelStepper(MotorInterfaceType, 26, 33, 25, 32);
 AccelStepper Vstepper = AccelStepper(MotorInterfaceType, 13, 14, 12, 27);
 AccelStepper Sstepper = AccelStepper(MotorInterfaceType, 5, 19, 18, 21);
+
+AccelStepper *StepPtr = &Hstepper;
 
 BluetoothSerial ESP_BT; // init Class:AccelStepper *pStepper;
 
 #define FORMAT_LITTLEFS_IF_FAILED true
 char g_output[256]; // Serialized water target object
 char path[10];      // Used by function 'stochar()'
-int appClear = 255;
-int stepperNum = 0;
+
 //++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 // All function declarations go here
 void homeStepper(AccelStepper &Stepper, int homePin);
 void processIncoming(int incoming);
-void processStepper(AccelStepper &Stepper, int incoming);
-void doStepLoop(AccelStepper &Stepper);
+void processStepper(AccelStepper *Stepper, int incoming);
+void doStepLoop(AccelStepper *Stepper);
 
 void makeWaterTarget(int id, String name, long Hs, long Hf, long Vs, long Vf, long Ss, long Sf, long rwt, bool W_on);
 void listDir(fs::FS &fs, const char *dirname, uint8_t levels);
