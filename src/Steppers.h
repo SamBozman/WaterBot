@@ -2,16 +2,16 @@
 #pragma once
 #include "Files.h"
 //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-void homeStepper(AccelStepper &Stepper, int homePin)
+void homeStepper(AccelStepper& Stepper, int homePin)
 {
-    int move_finished = 1;    // Used to check if move is completed
+    int move_finished = 1; // Used to check if move is completed
     long initial_homing = -1; // Used to Home Stepper at startup
     pinMode(homePin, INPUT_PULLUP);
 
     delay(5);
 
     //  Set Max Speed and Acceleration of each Steppers at startup for homing
-    Stepper.setMaxSpeed(100.0);     // Set Max Speed of Stepper (Slower to get better accuracy)
+    Stepper.setMaxSpeed(100.0); // Set Max Speed of Stepper (Slower to get better accuracy)
     Stepper.setAcceleration(100.0); // Set Acceleration of Stepper
 
     // Start Homing procedure of Stepper Motor at startup
@@ -21,18 +21,17 @@ void homeStepper(AccelStepper &Stepper, int homePin)
         // Make the Stepper move CCW
         // until the switch is activated
         Stepper.moveTo(initial_homing); // Set the position to move to
-        initial_homing--;               // Decrease by 1 for next move if needed
-        Stepper.run();                  // Non Blocking - move to position
+        initial_homing--; // Decrease by 1 for next move if needed
+        Stepper.run(); // Non Blocking - move to position
         delay(5);
     }
 
-    Stepper.setCurrentPosition(0);  // Set the current position as zero for now
-    Stepper.setMaxSpeed(100.0);     // Set Max Speed of Stepper (Slower to get better accuracy)
+    Stepper.setCurrentPosition(0); // Set the current position as zero for now
+    Stepper.setMaxSpeed(100.0); // Set Max Speed of Stepper (Slower to get better accuracy)
     Stepper.setAcceleration(100.0); // Set Acceleration of Stepper
 
     initial_homing = 1;
-    while (!digitalRead(homePin))
-    {
+    while (!digitalRead(homePin)) {
         // Make the Stepper move CW until the
         // until the switch is deactivated
         Stepper.moveTo(initial_homing);
@@ -50,7 +49,7 @@ void homeStepper(AccelStepper &Stepper, int homePin)
     Stepper.moveTo(rnum);
     Stepper.runToPosition();
 
-    Stepper.setMaxSpeed(200.0);     // Set Max Speed of Stepper (Faster for regular movements)
+    Stepper.setMaxSpeed(200.0); // Set Max Speed of Stepper (Faster for regular movements)
     Stepper.setAcceleration(100.0); // Set Acceleration of Stepper
 }
 //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
@@ -58,41 +57,45 @@ void processIncoming(int incoming)
 {
     unsigned char textBlock[] = "Hello to everyone who loves me \n";
     unsigned char textBlock2[] = "Goodbye to everyone who hates me \n";
-    switch (incoming)
-    {
+
+    switch (incoming) {
 
     case 201:
-        StepPtr = &Hstepper;    // Hstepper
+        StepPtr = &Hstepper; // Hstepper
         ESP_BT.write(appClear); // reset slider poition to 100 (center) & clear buttons
         ESP_BT.write(incoming); // Set app to use Hstepper
+        currentStepper = incoming;
         debugln("Sending 201 back to app");
         break;
     case 202:
-        StepPtr = &Vstepper;    // Vstepper
+        StepPtr = &Vstepper; // Vstepper
         ESP_BT.write(appClear); // reset slider poition to 100 (center) & clear buttons
         ESP_BT.write(incoming); // Set app to use Vstepper
+        currentStepper = incoming;
         debugln("Sending 202 back to app");
         break;
     case 203:
-        StepPtr = &Sstepper;    // Sstepper
+        StepPtr = &Sstepper; // Sstepper
         ESP_BT.write(appClear); // reset slider poition to 100 (center) & clear buttons
         ESP_BT.write(incoming); // Set app to use Sstepper
+        currentStepper = incoming;
         debugln("Sending 203 back to app");
         break;
-    case 204:                   //! Will eventually be used to control water on/off
+    case 204: //! Will eventually be used to control water on/off
         ESP_BT.write(appClear); // reset slider poition to 100 (center) & clear buttons
         ESP_BT.write(incoming); // //! Will eventually be used to control water on/off
         debugln("Sending 204 back to app");
         break;
-    case 254:                   //! Testing blob text to WaterBot app
+    case 254: //! Testing blob text to WaterBot app
         ESP_BT.write(appClear); // reset slider poition to 100 (center) & clear buttons
         ESP_BT.write(textBlock, sizeof(textBlock));
         ESP_BT.write(textBlock2, sizeof(textBlock2)); //* Testing writing block to text back to app
+
         debugln("Sending text block back to app");
         break;
-    case 255:                   //! disableOutputs for testing 
+    case 255: //! disableOutputs for testing
         ESP_BT.write(appClear); // reset slider poition to 100 (center) & clear buttons
-        ESP_BT.write(incoming); 
+        ESP_BT.write(incoming);
         debugln("Sending 255 back to app");
         Hstepper.disableOutputs(); // TODO Temporary to shut off steppers for testing
         Vstepper.disableOutputs(); // TODO Temporary to shut off steppers for testing
@@ -105,25 +108,20 @@ void processIncoming(int incoming)
 }
 
 // //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-void processStepper(AccelStepper *Stepper, int incoming)
+void processStepper(AccelStepper* Stepper, int incoming)
 {
     int stepperSpeed = 0;
     Stepper->setMaxSpeed(300);
     Stepper->setSpeed(stepperSpeed);
     incoming = incoming - 100;
 
-    if (incoming >= -5 && incoming <= 5)
-    {
+    if (incoming >= -5 && incoming <= 5) {
         stepperSpeed = 0;
         ESP_BT.write(stepperSpeed);
-    }
-    else if (incoming >= -100 && incoming <= 100)
-    {
+    } else if (incoming >= -100 && incoming <= 100) {
         stepperSpeed = incoming;
         ESP_BT.write(abs(stepperSpeed)); // abs changes negative values to positive
-    }
-    else
-    {
+    } else {
         stepperSpeed = 0;
         ESP_BT.write(stepperSpeed);
     }
@@ -131,27 +129,23 @@ void processStepper(AccelStepper *Stepper, int incoming)
 }
 
 // //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-void doStepLoop(AccelStepper *Stepper)
+void doStepLoop(AccelStepper* Stepper)
 {
-    debug("Current position is ");
-    debugln(Stepper->currentPosition());
+    // debug("Current position is ");
+    // debugln(Stepper->currentPosition());
 
-    if (Stepper->currentPosition() < -10)
-    {
-        Stepper->setMaxSpeed(100.0);    // Set Max Speed of Stepper (Slower to get better accuracy)
+    if (Stepper->currentPosition() < -10) {
+        Stepper->setMaxSpeed(100.0); // Set Max Speed of Stepper (Slower to get better accuracy)
         Stepper->setAcceleration(50.0); // Set Acceleration of Stepper
         Stepper->moveTo(home);
         Stepper->runToPosition();
         ESP_BT.write(appClear);
-    }
-    else if (Stepper->currentPosition() > (maxPosition + 10))
-    {
-        Stepper->setMaxSpeed(100.0);    // Set Max Speed of Stepper (Slower to get better accuracy)
+    } else if (Stepper->currentPosition() > (maxPosition + 10)) {
+        Stepper->setMaxSpeed(100.0); // Set Max Speed of Stepper (Slower to get better accuracy)
         Stepper->setAcceleration(50.0); // Set Acceleration of Stepper
         Stepper->moveTo(maxPosition);
         Stepper->runToPosition();
         ESP_BT.write(appClear);
-    }
-    else
+    } else
         Stepper->runSpeed();
 }
