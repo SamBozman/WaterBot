@@ -6,7 +6,7 @@ void stochar(int x)
 {
     String s = "/A" + String(x); // Combine 2 strings
     int n = s.length(); // Get length of combined string
-    strcpy(path, s.c_str()); // Convert it to a char array
+   strcpy(path, s.c_str());  // Convert it to a char array
 }
 
 // Create random water Target json files and write them to file system

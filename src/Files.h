@@ -2,6 +2,31 @@
 #include "testFunctions.h"
 
 //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+void setMax(AccelStepper* Stepper)
+{
+    if (currentStepper > 0 && Stepper->currentPosition() > 0) {
+        String s = "/MAX/M" + String(currentStepper); // Combine 2 strings
+        strcpy(path, s.c_str()); // Convert it to a char array
+
+        StaticJsonDocument<256> doc; // Declare StaticJsonDocument doc
+        doc["MSP"] = Stepper->currentPosition(); //''Max Stepper Position'
+        serializeJson(doc, g_output);
+        writeFile(LittleFS, path, g_output);
+        switch (currentStepper) {
+        case 1:
+            H_MaxPos = Stepper->currentPosition();
+            break;
+        case 2:
+            V_MaxPos = Stepper->currentPosition();
+            break;
+        case 3:
+            S_MaxPos = Stepper->currentPosition();
+            break;
+        }
+    }
+}
+
+//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 void makeWaterTarget(int id, String name, long Hs, long Hf, long Vs, long Vf, long Ss, long Sf, long rwt, bool W_on)
 {
     const int capacity = 256; // Buffer for StaticJsonDocument doc

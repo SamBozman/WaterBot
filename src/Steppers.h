@@ -43,11 +43,11 @@ void homeStepper(AccelStepper& Stepper, int homePin)
     Serial.println("Homing Completed");
     Serial.println("");
 
-    int rnum;
-    srand(time(0));
-    rnum = rand() % (500 + 1 - 100) + 100;
-    Stepper.moveTo(rnum);
-    Stepper.runToPosition();
+    // int rnum;
+    // srand(time(0));
+    // rnum = rand() % (500 + 1 - 100) + 100;
+    // Stepper.moveTo(rnum);
+    // Stepper.runToPosition();
 
     Stepper.setMaxSpeed(200.0); // Set Max Speed of Stepper (Faster for regular movements)
     Stepper.setAcceleration(100.0); // Set Acceleration of Stepper
@@ -62,30 +62,40 @@ void processIncoming(int incoming)
 
     case 201:
         StepPtr = &Hstepper; // Hstepper
+        MaxPtr = &H_MaxPos;
         ESP_BT.write(appClear); // reset slider poition to 100 (center) & clear buttons
         ESP_BT.write(incoming); // Set app to use Hstepper
-        currentStepper = incoming;
         debugln("Sending 201 back to app");
+        currentStepper = 1;
         break;
     case 202:
         StepPtr = &Vstepper; // Vstepper
+        MaxPtr = &V_MaxPos;
         ESP_BT.write(appClear); // reset slider poition to 100 (center) & clear buttons
         ESP_BT.write(incoming); // Set app to use Vstepper
-        currentStepper = incoming;
         debugln("Sending 202 back to app");
+        currentStepper = 2;
         break;
     case 203:
         StepPtr = &Sstepper; // Sstepper
+        MaxPtr = &S_MaxPos;
         ESP_BT.write(appClear); // reset slider poition to 100 (center) & clear buttons
         ESP_BT.write(incoming); // Set app to use Sstepper
-        currentStepper = incoming;
         debugln("Sending 203 back to app");
+        currentStepper = 3;
         break;
     case 204: //! Will eventually be used to control water on/off
         ESP_BT.write(appClear); // reset slider poition to 100 (center) & clear buttons
         ESP_BT.write(incoming); // //! Will eventually be used to control water on/off
         debugln("Sending 204 back to app");
         break;
+    case 205: // This is the SetMax for current stepper motor
+        ESP_BT.write(appClear); // ?? reset slider poition to 100 (center) & clear buttons
+        ESP_BT.write(incoming);
+        debugln("Sending 205 back to app");
+        setMax(StepPtr); // Save MaxPosition for currentStepper
+        break;
+
     case 254: //! Testing blob text to WaterBot app
         ESP_BT.write(appClear); // reset slider poition to 100 (center) & clear buttons
         ESP_BT.write(textBlock, sizeof(textBlock));
@@ -129,10 +139,8 @@ void processStepper(AccelStepper* Stepper, int incoming)
 }
 
 // //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-void doStepLoop(AccelStepper* Stepper)
+void doStepLoop(AccelStepper* Stepper, long* MaxPos)
 {
-    // debug("Current position is ");
-    // debugln(Stepper->currentPosition());
 
     if (Stepper->currentPosition() < -10) {
         Stepper->setMaxSpeed(100.0); // Set Max Speed of Stepper (Slower to get better accuracy)
@@ -140,10 +148,10 @@ void doStepLoop(AccelStepper* Stepper)
         Stepper->moveTo(home);
         Stepper->runToPosition();
         ESP_BT.write(appClear);
-    } else if (Stepper->currentPosition() > (maxPosition + 10)) {
+    } else if (Stepper->currentPosition() > (*MaxPos + 10)) {
         Stepper->setMaxSpeed(100.0); // Set Max Speed of Stepper (Slower to get better accuracy)
         Stepper->setAcceleration(50.0); // Set Acceleration of Stepper
-        Stepper->moveTo(maxPosition);
+        Stepper->moveTo(*MaxPos);
         Stepper->runToPosition();
         ESP_BT.write(appClear);
     } else

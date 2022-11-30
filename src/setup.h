@@ -9,17 +9,17 @@ void setup()
     mountLFS(); //* Return message to app if failed?
     ESP_BT.begin("ESP32_Control"); // Name of your Bluetooth interface
     delay(5000);
-    // directory used to store stepper max positions
+    // creat directory used to store stepper max positions
     if (!isDir(LittleFS, "/MAX", 1))
         createDir(LittleFS, "/MAX");
 
-    // directoryused to Target data
+    // create directory used to save Target data
     if (!isDir(LittleFS, "/TARGETS", 1))
         createDir(LittleFS, "/TARGETS");
 
-    // homeStepper(Hstepper, hHomePin);
-    //  homeStepper(Vstepper, vHomePin);
-    //  homeStepper(Sstepper, sHomePin);
+    homeStepper(Hstepper, hHomePin);
+    homeStepper(Vstepper, vHomePin);
+    homeStepper(Sstepper, sHomePin);
 
     // Shutoff water
     // TODO start a timer to shut down steppers after a specific time period.

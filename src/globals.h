@@ -23,7 +23,7 @@
 
 #define MotorInterfaceType 8
 #define home 0 // All steppers homing position is 0
-#define maxPosition 2700 //! TEMP for testing (needs to be set for each stepper)
+//#define maxPosition 2700 //! TEMP for testing (needs to be set for each stepper)
 
 // Hall Effect sensor pins
 #define hHomePin 34
@@ -38,11 +38,12 @@ BluetoothSerial ESP_BT;
 AccelStepper Hstepper = AccelStepper(MotorInterfaceType, 26, 33, 25, 32);
 AccelStepper Vstepper = AccelStepper(MotorInterfaceType, 13, 14, 12, 27);
 AccelStepper Sstepper = AccelStepper(MotorInterfaceType, 5, 19, 18, 21);
-AccelStepper* StepPtr = &Hstepper; // init Class:AccelStepper *StepPtr;
+AccelStepper* StepPtr = &Hstepper; // init StepPtr;
 
-long H_MaxPos = 0; // Horizontal Stepper Maximum travel position from home
-long V_MaxPos = 0; // Vertical Stepper Maximum travel position from home
-long S_MaxPos = 0; // Spray Stepper Maximum travel position from home
+long H_MaxPos = 10000; // Horizontal Stepper Maximum travel position from home
+long V_MaxPos = 10000; // Vertical Stepper Maximum travel position from home
+long S_MaxPos = 10000; // Spray Stepper Maximum travel position from home
+long* MaxPtr = &H_MaxPos; // init MaxPtr
 int currentStepper = 0;
 
 #define FORMAT_LITTLEFS_IF_FAILED true
@@ -51,10 +52,11 @@ char path[10]; // Used by function 'stochar()'
 
 //++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 // All function declarations go here
+void setMax(AccelStepper* Stepper);
 void homeStepper(AccelStepper& Stepper, int homePin);
 void processIncoming(int incoming);
 void processStepper(AccelStepper* Stepper, int incoming);
-void doStepLoop(AccelStepper* Stepper);
+void doStepLoop(AccelStepper* Stepper, long* MaxPos);
 
 void makeWaterTarget(int id, String name, long Hs, long Hf, long Vs, long Vf, long Ss, long Sf, long rwt, bool W_on);
 void listDir(fs::FS& fs, const char* dirname, uint8_t levels);
