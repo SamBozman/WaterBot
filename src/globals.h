@@ -47,13 +47,13 @@ long* MaxPtr = &H_MaxPos; // init MaxPtr
 int currentStepper = 0;
 
 #define FORMAT_LITTLEFS_IF_FAILED true
-char g_output[256]; // Serialized water target object
+char g_output[255]; // Serialized water target object
 char path[25]; // path to saved files
 
 //++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 // All function declarations go here
 void setMax(AccelStepper* Stepper);
-void loadMax(char* path);
+void loadMax(char* path, long* Maxptr);
 void homeStepper(AccelStepper& Stepper, int homePin);
 void processIncoming(int incoming);
 void processStepper(AccelStepper* Stepper, int incoming);

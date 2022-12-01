@@ -19,16 +19,29 @@ void setup()
     if (!numFiles == 3) {
         debug("NOT ALL MAXIMUM POSITIONS HAVE BEEN SET: ");
     } else { // load all maximum positions
+
         s = "/MAX/M1";
+        MaxPtr = &H_MaxPos;
         strcpy(path, s.c_str());
-        loadMax(path);
+        loadMax(path, MaxPtr);
+
         s = "/MAX/M2";
+        MaxPtr = &V_MaxPos;
         strcpy(path, s.c_str());
-        loadMax(path);
+        loadMax(path, MaxPtr);
+
         s = "/MAX/M3";
+        MaxPtr = &S_MaxPos;
         strcpy(path, s.c_str());
-        loadMax(path);
+        loadMax(path, MaxPtr);
     }
+
+    debug("H_MaxPos =: ");
+    debugln(H_MaxPos);
+    debug("V_MaxPos =: ");
+    debugln(V_MaxPos);
+    debug("S_MaxPos =: ");
+    debugln(S_MaxPos);
 
     // homeStepper(Hstepper, hHomePin);
     // homeStepper(Vstepper, vHomePin);

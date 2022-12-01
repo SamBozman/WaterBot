@@ -2,7 +2,7 @@
 #include "testFunctions.h"
 
 //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-void loadMax(char* path)
+void loadMax(char* path, long* MaxPtr)
 {
 
     File file = LittleFS.open(path);
@@ -23,14 +23,15 @@ void loadMax(char* path)
     file.close();
     debug("g_output = : ");
     debugln(g_output);
-
-    // DeserializationError err = deserializeJson(doc, input);
-    // if (err) {
-    //     Serial.print(F("deserializeJson() failed with code "));
-    //     Serial.println(err.f_str());
-    // }
+    StaticJsonDocument<255> doc;
+    DeserializationError err = deserializeJson(doc, g_output);
+    if (err) {
+        Serial.print(F("deserializeJson() failed with code "));
+        Serial.println(err.f_str());
+    } else {
+        *MaxPtr = doc["MSP"];
+    }
 }
-
 
 //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 void setMax(AccelStepper* Stepper)
