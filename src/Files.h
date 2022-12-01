@@ -2,6 +2,37 @@
 #include "testFunctions.h"
 
 //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+void loadMax(char* path)
+{
+
+    File file = LittleFS.open(path);
+    if (!file || file.isDirectory()) {
+        debugln("- failed to open file for reading");
+        return;
+    }
+
+    debugln("- reading from file: ");
+
+    int x = 0;
+    while (file.available()) {
+        g_output[x] = file.read();
+        x++;
+    }
+    g_output[x] = 0; // delimiter
+
+    file.close();
+    debug("g_output = : ");
+    debugln(g_output);
+
+    // DeserializationError err = deserializeJson(doc, input);
+    // if (err) {
+    //     Serial.print(F("deserializeJson() failed with code "));
+    //     Serial.println(err.f_str());
+    // }
+}
+
+
+//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 void setMax(AccelStepper* Stepper)
 {
     if (currentStepper > 0 && Stepper->currentPosition() > 0) {

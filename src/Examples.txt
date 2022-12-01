@@ -1,4 +1,6 @@
 LittleFS examples {
+    numFiles = listFiles(LittleFS, "/", 1, numFiles);//get number of files in a directory
+    
     debugln("SPIFFS-like write file to new path and delete it w/folders");
     writeFile2(LittleFS, "/new1/new2/new3/hello3.txt", "Hello3");
     listDir(LittleFS, "/", 3);
