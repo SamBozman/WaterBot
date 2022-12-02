@@ -2,6 +2,25 @@
 #include "testFunctions.h"
 
 //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+void resetMax()
+{
+    switch (currentStepper) {
+    case 1:
+        H_MaxPos = 10000;
+        debugln("Reset Horz stepper to 10000");
+        break;
+    case 2:
+        V_MaxPos = 10000;
+        debugln("Reset Vert stepper to 10000");
+        break;
+    case 3:
+        S_MaxPos = 10000;
+        debugln("Reset Spray stepper to 10000");
+        break;
+    }
+}
+
+//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 void loadMax(char* path, long* MaxPtr)
 {
 

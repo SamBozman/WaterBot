@@ -63,48 +63,50 @@ void processIncoming(int incoming)
     case 201:
         StepPtr = &Hstepper; // Hstepper
         MaxPtr = &H_MaxPos;
-        ESP_BT.write(appClear); // reset slider poition to 100 (center) & clear buttons
         ESP_BT.write(incoming); // Set app to use Hstepper
         debugln("Sending 201 back to app");
         currentStepper = 1;
+        ESP_BT.write(resetSlider);
         break;
     case 202:
         StepPtr = &Vstepper; // Vstepper
         MaxPtr = &V_MaxPos;
-        ESP_BT.write(appClear); // reset slider poition to 100 (center) & clear buttons
         ESP_BT.write(incoming); // Set app to use Vstepper
         debugln("Sending 202 back to app");
         currentStepper = 2;
+        ESP_BT.write(resetSlider);
         break;
     case 203:
         StepPtr = &Sstepper; // Sstepper
         MaxPtr = &S_MaxPos;
-        ESP_BT.write(appClear); // reset slider poition to 100 (center) & clear buttons
         ESP_BT.write(incoming); // Set app to use Sstepper
         debugln("Sending 203 back to app");
         currentStepper = 3;
+        ESP_BT.write(resetSlider);
         break;
     case 204: //! Will eventually be used to control water on/off
-        ESP_BT.write(appClear); // reset slider poition to 100 (center) & clear buttons
-        ESP_BT.write(incoming); // //! Will eventually be used to control water on/off
+        ESP_BT.write(incoming);
         debugln("Sending 204 back to app");
         break;
     case 205: // This is the SetMax for current stepper motor
-        ESP_BT.write(appClear); // ?? reset slider poition to 100 (center) & clear buttons
         ESP_BT.write(incoming);
         debugln("Sending 205 back to app");
         setMax(StepPtr); // Save MaxPosition for currentStepper
         break;
-
+    case 206: // This is the RESET MAX for current stepper motor
+        ESP_BT.write(incoming);
+        debugln("Sending 206 back to app");
+        resetMax(); // Reset current stepper motor max position to 10000
+        break;
     case 254: //! Testing blob text to WaterBot app
-        ESP_BT.write(appClear); // reset slider poition to 100 (center) & clear buttons
+        ESP_BT.write(resetSlider); // reset slider poition to 100 (center) & clear buttons
         ESP_BT.write(textBlock, sizeof(textBlock));
         ESP_BT.write(textBlock2, sizeof(textBlock2)); //* Testing writing block to text back to app
 
         debugln("Sending text block back to app");
         break;
     case 255: //! disableOutputs for testing
-        ESP_BT.write(appClear); // reset slider poition to 100 (center) & clear buttons
+        ESP_BT.write(resetSlider); // reset slider poition to 100 (center) & clear buttons
         ESP_BT.write(incoming);
         debugln("Sending 255 back to app");
         Hstepper.disableOutputs(); // TODO Temporary to shut off steppers for testing
@@ -147,13 +149,13 @@ void doStepLoop(AccelStepper* Stepper, long* MaxPos)
         Stepper->setAcceleration(50.0); // Set Acceleration of Stepper
         Stepper->moveTo(home);
         Stepper->runToPosition();
-        ESP_BT.write(appClear);
+        ESP_BT.write(resetSlider);
     } else if (Stepper->currentPosition() > (*MaxPos + 10)) {
         Stepper->setMaxSpeed(100.0); // Set Max Speed of Stepper (Slower to get better accuracy)
         Stepper->setAcceleration(50.0); // Set Acceleration of Stepper
         Stepper->moveTo(*MaxPos);
         Stepper->runToPosition();
-        ESP_BT.write(appClear);
+        ESP_BT.write(resetSlider);
     } else
         Stepper->runSpeed();
 }

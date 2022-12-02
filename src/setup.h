@@ -36,16 +36,10 @@ void setup()
         loadMax(path, MaxPtr);
     }
 
-    debug("H_MaxPos =: ");
-    debugln(H_MaxPos);
-    debug("V_MaxPos =: ");
-    debugln(V_MaxPos);
-    debug("S_MaxPos =: ");
-    debugln(S_MaxPos);
-
-    // homeStepper(Hstepper, hHomePin);
-    // homeStepper(Vstepper, vHomePin);
-    // homeStepper(Sstepper, sHomePin);
+  
+    homeStepper(Hstepper, hHomePin);
+    homeStepper(Vstepper, vHomePin);
+    homeStepper(Sstepper, sHomePin);
 
     // Shutoff water
     // TODO start a timer to shut down steppers after a specific time period.

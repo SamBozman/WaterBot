@@ -30,7 +30,7 @@
 #define vHomePin 39
 #define sHomePin 36
 
-#define appClear 255 // reset slider poition & clear button backgrounds
+#define resetSlider 255 // reset slider poition & clear button backgrounds
 //* The above also temporarily disables the steppers
 
 BluetoothSerial ESP_BT;
@@ -52,6 +52,7 @@ char path[25]; // path to saved files
 
 //++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 // All function declarations go here
+void resetMax();
 void setMax(AccelStepper* Stepper);
 void loadMax(char* path, long* Maxptr);
 void homeStepper(AccelStepper& Stepper, int homePin);
