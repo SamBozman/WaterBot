@@ -48,11 +48,12 @@ int currentStepper = 0;
 
 #define FORMAT_LITTLEFS_IF_FAILED true
 char g_output[255]; // Serialized water target object
+String textIncoming = "";
 char path[25]; // path to saved files
 
 //++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 // All function declarations go here
-void getJson(); // Get json file fron app dictionary
+void getJson();
 void resetMax();
 void setMax(AccelStepper* Stepper);
 void loadMax(char* path, long* Maxptr);
