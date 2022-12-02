@@ -98,6 +98,12 @@ void processIncoming(int incoming)
         debugln("Sending 206 back to app");
         resetMax(); // Reset current stepper motor max position to 10000
         break;
+    case 207: // Used to test sending Json from app
+        getJson();
+        ESP_BT.write(207);
+        debugln("Sending 207 back to app");
+        break;
+
     case 254: //! Testing blob text to WaterBot app
         ESP_BT.write(resetSlider); // reset slider poition to 100 (center) & clear buttons
         ESP_BT.write(textBlock, sizeof(textBlock));
@@ -105,6 +111,7 @@ void processIncoming(int incoming)
 
         debugln("Sending text block back to app");
         break;
+
     case 255: //! disableOutputs for testing
         ESP_BT.write(resetSlider); // reset slider poition to 100 (center) & clear buttons
         ESP_BT.write(incoming);

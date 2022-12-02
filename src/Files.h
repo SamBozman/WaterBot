@@ -1,6 +1,17 @@
 #pragma once
 #include "testFunctions.h"
 
+void getJson(){
+    int x = 0;
+        while (ESP_BT.available()) {
+            g_output[x] = (ESP_BT.read()); // Read byte from cell-phone
+            x++;
+        }
+        g_output[x] = 0; // delimiter
+        debugln(g_output);
+}
+
+
 //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 void resetMax()
 {

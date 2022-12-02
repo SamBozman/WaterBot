@@ -52,6 +52,7 @@ char path[25]; // path to saved files
 
 //++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 // All function declarations go here
+void getJson(); // Get json file fron app dictionary
 void resetMax();
 void setMax(AccelStepper* Stepper);
 void loadMax(char* path, long* Maxptr);
