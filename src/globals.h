@@ -46,7 +46,6 @@ long H_MaxPos = 10000; // Horizontal Stepper Maximum travel position from home
 long V_MaxPos = 10000; // Vertical Stepper Maximum travel position from home
 long S_MaxPos = 10000; // Spray Stepper Maximum travel position from home
 long* MaxPtr = &H_MaxPos; // init MaxPtr
-int currentStepper = 0;
 
 #define FORMAT_LITTLEFS_IF_FAILED true
 char g_output[255]; // Serialized water target object
@@ -58,7 +57,7 @@ char path[25]; // path to saved files
 class target;
 void convertStringToInt();
 void getJson();
-void resetMax();
+void resetMax(AccelStepper* Stepper);
 void setMax(AccelStepper* Stepper);
 void loadMax(char* path, long* Maxptr);
 void homeStepper(AccelStepper& Stepper, int homePin);

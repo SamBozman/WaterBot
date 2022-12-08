@@ -63,7 +63,6 @@ void processIncoming(int incoming)
     case 201:
         StepPtr = &Hstepper; // Hstepper
         MaxPtr = &H_MaxPos;
-        currentStepper = 1;
         ESP_BT.write(201); // Set app to use Hstepper
         debugln("Sending 201 back to app");
         ESP_BT.write(resetSlider);
@@ -71,7 +70,6 @@ void processIncoming(int incoming)
     case 202:
         StepPtr = &Vstepper; // Vstepper
         MaxPtr = &V_MaxPos;
-        currentStepper = 2;
         ESP_BT.write(202); // Set app to use Vstepper
         debugln("Sending 202 back to app");
         ESP_BT.write(resetSlider);
@@ -79,7 +77,6 @@ void processIncoming(int incoming)
     case 203:
         StepPtr = &Sstepper; // Sstepper
         MaxPtr = &S_MaxPos;
-        currentStepper = 3;
         ESP_BT.write(203); // Set app to use Sstepper
         debugln("Sending 203 back to app");
         ESP_BT.write(resetSlider);
@@ -94,7 +91,7 @@ void processIncoming(int incoming)
         debugln("Sending 205 back to app");
         break;
     case 206: // RESET MAX to 10,000 for current stepper motor
-        resetMax();
+        resetMax(StepPtr);
         ESP_BT.write(206);
         debugln("Sending 206 back to app");
         break;
@@ -123,7 +120,7 @@ void processIncoming(int incoming)
     }
 }
 
-// //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 void processStepper(AccelStepper* Stepper, int incoming)
 {
     int stepperSpeed = 0;
@@ -144,7 +141,7 @@ void processStepper(AccelStepper* Stepper, int incoming)
     Stepper->setSpeed(stepperSpeed);
 }
 
-// //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 void doStepLoop(AccelStepper* Stepper, long* MaxPos)
 {
 

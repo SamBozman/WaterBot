@@ -9,35 +9,32 @@ void getJson()
 }
 
 //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-void resetMax()
+void resetMax(AccelStepper* Stepper)
 {
-    switch (currentStepper) {
-    case 1:
+    if (Stepper == &Hstepper) {
         H_MaxPos = 10000;
         debugln("Reset Horz stepper to 10000");
-        break;
-    case 2:
+    } else if (Stepper == &Vstepper) {
         V_MaxPos = 10000;
         debugln("Reset Vert stepper to 10000");
-        break;
-    case 3:
+    } else if (Stepper == &Sstepper) {
         S_MaxPos = 10000;
         debugln("Reset Spray stepper to 10000");
-        break;
     }
 }
 
 //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 void loadMax(char* path, long* MaxPtr)
-{
+{ // This function loads the maximum position for ONLY 1 stepper
 
     File file = LittleFS.open(path);
     if (!file || file.isDirectory()) {
-        debugln("- failed to open file for reading");
+        debugln("- failed to open MAX directory for reading");
         return;
     }
 
-    debugln("- reading from file: ");
+    debug("- reading from MAX direcory file: ");
+    debugln(path);
 
     int x = 0;
     while (file.available()) {
@@ -47,14 +44,15 @@ void loadMax(char* path, long* MaxPtr)
     g_output[x] = 0; // delimiter
 
     file.close();
-    debug("g_output = : ");
-    debugln(g_output);
+
     StaticJsonDocument<255> doc;
     DeserializationError err = deserializeJson(doc, g_output);
     if (err) {
         Serial.print(F("deserializeJson() failed with code "));
         Serial.println(err.f_str());
     } else {
+        // MaxPtr dereferenced to current stepper Maximum position global variable
+        //  long ?_MaxPos (? = H,V or S) doc key ["MSP"] contains a long position
         *MaxPtr = doc["MSP"];
     }
 }
@@ -62,6 +60,22 @@ void loadMax(char* path, long* MaxPtr)
 //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 void setMax(AccelStepper* Stepper)
 {
+    int currentStepper = 0;
+
+    if (Stepper == &Hstepper) {
+        currentStepper = 1;
+        H_MaxPos = Stepper->currentPosition();
+        debugln("H_MaxPos set to current position!");
+    } else if (Stepper == &Vstepper) {
+        currentStepper = 2;
+        V_MaxPos = Stepper->currentPosition();
+        debugln("V_MaxPos set to current position!");
+    } else if (Stepper == &Sstepper) {
+        currentStepper = 3;
+        S_MaxPos = Stepper->currentPosition();
+        debugln("S_MaxPos set to current position!");
+    }
+
     if (currentStepper > 0 && Stepper->currentPosition() > 0) {
         String s = "/MAX/M" + String(currentStepper); // Combine 2 strings
         strcpy(path, s.c_str()); // Convert it to a char array
@@ -70,17 +84,6 @@ void setMax(AccelStepper* Stepper)
         doc["MSP"] = Stepper->currentPosition(); //''Max Stepper Position'
         serializeJson(doc, g_output);
         writeFile(LittleFS, path, g_output);
-        switch (currentStepper) {
-        case 1:
-            H_MaxPos = Stepper->currentPosition();
-            break;
-        case 2:
-            V_MaxPos = Stepper->currentPosition();
-            break;
-        case 3:
-            S_MaxPos = Stepper->currentPosition();
-            break;
-        }
     }
 }
 

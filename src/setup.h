@@ -37,10 +37,11 @@ void setup()
         loadMax(path, MaxPtr);
     }
 
-    // homeStepper(Hstepper, hHomePin);
-    // homeStepper(Vstepper, vHomePin);
-    // homeStepper(Sstepper, sHomePin);
+    homeStepper(Hstepper, hHomePin);
+    homeStepper(Vstepper, vHomePin);
+    homeStepper(Sstepper, sHomePin);
 
     // Shutoff water
     // TODO start a timer to shut down steppers after a specific time period.
 }
+// Find ternary.
