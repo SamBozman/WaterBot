@@ -1,5 +1,7 @@
 #pragma once
-
+// #include <iostream>
+// #include <string>
+// using namespace std;
 #include <AccelStepper.h>
 #include <Arduino.h>
 #include <ArduinoJson.h>
@@ -53,6 +55,8 @@ char path[25]; // path to saved files
 
 //++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 // All function declarations go here
+class target;
+void convertStringToInt();
 void getJson();
 void resetMax();
 void setMax(AccelStepper* Stepper);
