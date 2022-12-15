@@ -1,12 +1,12 @@
 #pragma once
-#include "globals.h"
+#include "declarations.h"
 
 // function to make a char path from a string
 void stochar(int x)
 {
     String s = "/A" + String(x); // Combine 2 strings
     int n = s.length(); // Get length of combined string
-   strcpy(path, s.c_str());  // Convert it to a char array
+    strcpy(path, s.c_str()); // Convert it to a char array
 }
 
 // Create random water Target json files and write them to file system
@@ -23,7 +23,6 @@ void createTestFiles(int n)
     numFiles = listFiles(LittleFS, "/", 1, numFiles);
     debug("Number of files = ");
     debugln(numFiles);
-
 }
 
 // Remove random water Target json files from file system
