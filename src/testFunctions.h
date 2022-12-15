@@ -1,5 +1,5 @@
 #pragma once
-#include "declarations.h"
+#include "data_manager.h"
 
 // function to make a char path from a string
 void stochar(int x)

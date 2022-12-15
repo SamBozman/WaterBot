@@ -7,6 +7,10 @@
 #include <ArduinoJson.h>
 #include <ArduinoLog.h>
 #include <LittleFS.h>
+#include <algorithm>
+#include <iostream> // for testing output in main
+#include <set>
+#include <string>
 
 #include "BluetoothSerial.h" // Bluetooth Serial -> works ONLY on ESP32
 #include "FS.h"
