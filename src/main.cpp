@@ -1,4 +1,6 @@
+#include "data_manager.h"
 #include "setup.h"
+
 
 void loop()
 
@@ -10,5 +12,3 @@ void loop()
 
     doStepLoop(StepPtr, MaxPtr);
 }
-
-

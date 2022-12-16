@@ -1,4 +1,6 @@
 #pragma once
+// From declarations
+
 // #include <iostream>
 // #include <string>
 // using namespace std;

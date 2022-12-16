@@ -1,5 +1,6 @@
 #pragma once
 #include "testFunctions.h"
+// from steppers
 
 void getJson()
 {
@@ -88,21 +89,21 @@ void setMax(AccelStepper* Stepper)
 }
 
 //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-void makeWaterTarget(int id, String name, long Hs, long Hf, long Vs, long Vf, long Ss, long Sf, long rwt, bool W_on)
+void makeWaterTarget(int id, String name, long hs, int hf, long vs, int vf, long ss, int sf, int rwt, bool water)
 {
     const int capacity = 256; // Buffer for StaticJsonDocument doc
     StaticJsonDocument<capacity> doc; // Declare StaticJsonDocument doc
 
-    doc["ID"] = id; //(Int) ID  for watering target
-    doc["Name"] = name;
-    doc["H_Steps"] = Hs; // Horizontal steps from 'Home'
-    doc["H_Flux"] = Hf; // Horizontal fluctuation for coverage
-    doc["V_Steps"] = Vs; // Vertical steps from 'Home'
-    doc["V_Flux"] = Vf; // Vertical fluctuation for coverage
-    doc["S_steps"] = Ss; // Spray steps for diffused spray
-    doc["S_Flux"] = Sf; // Spray fluctuation for diffused spray
-    doc["RWT"] = rwt; // Relative watering time (1-5)
-    doc["Water_On?"] = W_on; // Turn water off ? (or leave on while moving to next spot)
+    doc["id"] = id; //(Int) ID  for watering target
+    doc["name"] = name;
+    doc["hs"] = hs; // Horizontal steps from 'Home'
+    doc["hf"] = hf; // Horizontal fluctuation for coverage
+    doc["vs"] = vs; // Vertical steps from 'Home'
+    doc["vf"] = vf; // Vertical fluctuation for coverage
+    doc["ss"] = ss; // Spray steps for diffused spray
+    doc["sf"] = sf; // Spray fluctuation for diffused spray
+    doc["rwt"] = rwt; // Relative watering time (1-5)
+    doc["water"] = water; // Turn water off ? (or leave on while moving to next spot)
     // Serialize the Json object and put into variable (output)
     serializeJson(doc, g_output);
 }
@@ -308,117 +309,117 @@ void deleteFile(fs::FS& fs, const char* path)
 // CONFIG_LITTLEFS_SPIFFS_COMPAT 1
 
 //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-void writeFile2(fs::FS& fs, const char* path, const char* message)
-{
-    if (!fs.exists(path)) {
-        if (strchr(path, '/')) {
-            Serial.printf("Create missing folders of: %s\r\n", path);
-            char* pathStr = strdup(path);
-            if (pathStr) {
-                char* ptr = strchr(pathStr, '/');
-                while (ptr) {
-                    *ptr = 0;
-                    fs.mkdir(pathStr);
-                    *ptr = '/';
-                    ptr = strchr(ptr + 1, '/');
-                }
-            }
-            free(pathStr);
-        }
-    }
+// void writeFile2(fs::FS& fs, const char* path, const char* message)
+// {
+//     if (!fs.exists(path)) {
+//         if (strchr(path, '/')) {
+//             Serial.printf("Create missing folders of: %s\r\n", path);
+//             char* pathStr = strdup(path);
+//             if (pathStr) {
+//                 char* ptr = strchr(pathStr, '/');
+//                 while (ptr) {
+//                     *ptr = 0;
+//                     fs.mkdir(pathStr);
+//                     *ptr = '/';
+//                     ptr = strchr(ptr + 1, '/');
+//                 }
+//             }
+//             free(pathStr);
+//         }
+//     }
 
-    Serial.printf("Writing file to: %s\r\n", path);
-    File file = fs.open(path, FILE_WRITE);
-    if (!file) {
-        debugln("- failed to open file for writing");
-        return;
-    }
-    if (file.print(message)) {
-        debugln("- file written");
-    } else {
-        debugln("- write failed");
-    }
-    file.close();
-}
-
-//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-void deleteFile2(fs::FS& fs, const char* path)
-{
-    Serial.printf("Deleting file and empty folders on path: %s\r\n", path);
-
-    if (fs.remove(path)) {
-        debugln("- file deleted");
-    } else {
-        debugln("- delete failed");
-    }
-
-    char* pathStr = strdup(path);
-    if (pathStr) {
-        char* ptr = strrchr(pathStr, '/');
-        if (ptr) {
-            Serial.printf("Removing all empty folders on path: %s\r\n", path);
-        }
-        while (ptr) {
-            *ptr = 0;
-            fs.rmdir(pathStr);
-            ptr = strrchr(pathStr, '/');
-        }
-        free(pathStr);
-    }
-}
+//     Serial.printf("Writing file to: %s\r\n", path);
+//     File file = fs.open(path, FILE_WRITE);
+//     if (!file) {
+//         debugln("- failed to open file for writing");
+//         return;
+//     }
+//     if (file.print(message)) {
+//         debugln("- file written");
+//     } else {
+//         debugln("- write failed");
+//     }
+//     file.close();
+// }
 
 //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-void testFileIO(fs::FS& fs, const char* path)
-{
-    Serial.printf("Testing file I/O with %s\r\n", path);
+// void deleteFile2(fs::FS& fs, const char* path)
+// {
+//     Serial.printf("Deleting file and empty folders on path: %s\r\n", path);
 
-    static uint8_t buf[512];
-    size_t len = 0;
-    File file = fs.open(path, FILE_WRITE);
-    if (!file) {
-        debugln("- failed to open file for writing");
-        return;
-    }
+//     if (fs.remove(path)) {
+//         debugln("- file deleted");
+//     } else {
+//         debugln("- delete failed");
+//     }
 
-    size_t i;
-    debug("- writing");
-    uint32_t start = millis();
-    for (i = 0; i < 2048; i++) {
-        if ((i & 0x001F) == 0x001F) {
-            debug(".");
-        }
-        file.write(buf, 512);
-    }
-    debugln("");
-    uint32_t end = millis() - start;
-    Serial.printf(" - %u bytes written in %u ms\r\n", 2048 * 512, end);
-    file.close();
+//     char* pathStr = strdup(path);
+//     if (pathStr) {
+//         char* ptr = strrchr(pathStr, '/');
+//         if (ptr) {
+//             Serial.printf("Removing all empty folders on path: %s\r\n", path);
+//         }
+//         while (ptr) {
+//             *ptr = 0;
+//             fs.rmdir(pathStr);
+//             ptr = strrchr(pathStr, '/');
+//         }
+//         free(pathStr);
+//     }
+// }
 
-    file = fs.open(path);
-    start = millis();
-    end = start;
-    i = 0;
-    if (file && !file.isDirectory()) {
-        len = file.size();
-        size_t flen = len;
-        start = millis();
-        debug("- reading");
-        while (len) {
-            size_t toRead = len;
-            if (toRead > 512) {
-                toRead = 512;
-            }
-            file.read(buf, toRead);
-            if ((i++ & 0x001F) == 0x001F) {
-                debug(".");
-            }
-            len -= toRead;
-        }
-        debugln("");
-        end = millis() - start;
-        Serial.printf("- %u bytes read in %u ms\r\n", flen, end);
-        file.close();
-    } else {
-        debugln("- failed to open file for reading");
-    }
-}
+//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+// void testFileIO(fs::FS& fs, const char* path)
+// {
+//     Serial.printf("Testing file I/O with %s\r\n", path);
+
+//     static uint8_t buf[512];
+//     size_t len = 0;
+//     File file = fs.open(path, FILE_WRITE);
+//     if (!file) {
+//         debugln("- failed to open file for writing");
+//         return;
+//     }
+
+//     size_t i;
+//     debug("- writing");
+//     uint32_t start = millis();
+//     for (i = 0; i < 2048; i++) {
+//         if ((i & 0x001F) == 0x001F) {
+//             debug(".");
+//         }
+//         file.write(buf, 512);
+//     }
+//     debugln("");
+//     uint32_t end = millis() - start;
+//     Serial.printf(" - %u bytes written in %u ms\r\n", 2048 * 512, end);
+//     file.close();
+
+//     file = fs.open(path);
+//     start = millis();
+//     end = start;
+//     i = 0;
+//     if (file && !file.isDirectory()) {
+//         len = file.size();
+//         size_t flen = len;
+//         start = millis();
+//         debug("- reading");
+//         while (len) {
+//             size_t toRead = len;
+//             if (toRead > 512) {
+//                 toRead = 512;
+//             }
+//             file.read(buf, toRead);
+//             if ((i++ & 0x001F) == 0x001F) {
+//                 debug(".");
+//             }
+//             len -= toRead;
+//         }
+//         debugln("");
+//         end = millis() - start;
+//         Serial.printf("- %u bytes read in %u ms\r\n", flen, end);
+//         file.close();
+//     } else {
+//         debugln("- failed to open file for reading");
+//     }
+// }

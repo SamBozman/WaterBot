@@ -1,5 +1,6 @@
 #pragma once
 #include "steppers.h"
+// From main
 
 void setup()
 {
@@ -16,6 +17,8 @@ void setup()
     String s;
 
     int numFiles = listFiles(LittleFS, "/MAX", 1, 0);
+    debug("NumFiles in MAX directory is ");
+    debugln(numFiles);
 
     if (!numFiles == 3) {
         debug("NOT ALL MAXIMUM POSITIONS HAVE BEEN SET: ");
@@ -41,7 +44,22 @@ void setup()
     homeStepper(Vstepper, vHomePin);
     homeStepper(Sstepper, sHomePin);
 
+    numFiles = 0;
+    numFiles = listFiles(LittleFS, "/TARGETS", 1, 0);
+    debug("NumFiles before creating targets is ");
+    debugln(numFiles);
+
+    createTestFiles(2);
+    numFiles = 0;
+    numFiles = listFiles(LittleFS, "/TARGETS", 1, 0);
+    debug("NumFiles afeter creating targets is ");
+    debugln(numFiles);
+
+    removeTestFiles(2);
+    numFiles = 0;
+    numFiles = listFiles(LittleFS, "/TARGETS", 1, 0);
+    debug("NumFiles afeter deleting targets is ");
+    debugln(numFiles);
     // Shutoff water
     // TODO start a timer to shut down steppers after a specific time period.
 }
-
